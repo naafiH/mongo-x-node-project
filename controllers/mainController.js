@@ -3,11 +3,13 @@ const userData = require("../models/userSchema");
 let loginerrr = "";
 let signuperr = "";
 const bcrypt = require("bcryptjs");
+const product =require("../models/productschema")
 
 const object = {
-  homePage: (req, res) => {
+  homePage: async (req, res) => {
     if (req.session.secure) {
-      res.render("user/home");
+      const products = await product.find()
+      res.render("user/home",{products});
     } else {
       res.redirect("signup");
     }
@@ -16,14 +18,14 @@ const object = {
     if (req.session.secure) {
       res.redirect("/");
     } else {
-      res.render("user/signup", { signupError: signuperr });
+      res.render("signup", { signupError: signuperr });
     }
   },
   logInPage: (req, res) => {
     if (req.session.secure) {
       res.redirect("/");
     } else {
-      res.render("user/login", { LoginError: loginerrr });
+      res.render("login", { LoginError: loginerrr });
     }
   },
   postSignup: async (req, res) => {
@@ -60,15 +62,30 @@ const object = {
   postLogin: async (req, res) => {
     const { email, password } = req.body;
     const userExist = await userData.findOne({
-      email: email,
-      password: password,
+      email: email
     });
-    console.log(userExist, "esshgdh");
 
-    if (userExist) {
-      req.session.secure = password;
-      console.log("login complete");
-      res.redirect("/");
+    
+    // // console.log(isPassTrue);
+    // // console.log(userExist.hashPassword);
+    // console.log(password);
+    // console.log(userExist._id);
+    // console.log(userExist, "esshgdh");
+    if (userExist ) {
+      const isPassTrue = await bcrypt.compare(password,userExist.hashPassword) 
+      if(isPassTrue){
+
+        req.session.secure = userExist._id;
+        if (userExist.usertype === "admin") {
+          console.log(userExist.usertype);
+          req.session.isadmin = true;
+          res.redirect("admin/adminpage");
+        } else {
+          req.session.isadmin = false;
+          console.log("login complete");
+          res.redirect("/");
+        }
+      }
     } else {
       loginerrr = "you dont have an account please signup";
 
@@ -77,13 +94,24 @@ const object = {
   },
   logoutGet: (req, res) => {
     req.session.destroy((destroy) => {
+      const userExist =  userData.findOne()
       if (destroy) {
         console.log("there is an error in destroing");
       } else {
         res.redirect("/login");
+        console.log(userExist.email);
       }
     });
   },
+  // showProduct:async(req,res)=>{
+  //   try{
+  //     const products = await product.find()
+  //     console.log(products);
+  //     res.render("user/home",{products})
+  //   }catch{
+      
+  //   }
+  // }
 };
 
 module.exports = object;

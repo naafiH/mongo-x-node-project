@@ -5,17 +5,19 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const nocache = require("nocache");
 const path = require("path");
-const config = require("./config/config");
+require('dotenv').config();
 const userRouter = require("./router/userRouter");
 const adminRout=require("./router/adminRouter")
+
+// MongoDB connection
+require("./config/config");
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join("public")));
 
 app.set("view engine", "ejs");
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,

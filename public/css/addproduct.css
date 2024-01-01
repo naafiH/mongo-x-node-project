@@ -48,3 +48,12 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.Atag{
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    margin: 20px 0px;
+}
+.Atag button{
+    background-color: red;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/showproduct.css">
+    <title>Product Card</title>
+</head>
+<body>
+    <a class="directory" href="./addproduct"><button >go to Add product</button></a>
+    <% products.forEach(product => { %>
+        <div class="product-card">
+            <div class="product-image">
+                <img src="<%= product.productImage %>" alt="<%= product.productName %>">
+                <div class="overlay"></div>
+            </div>
+            <div class="product-details">
+                <h2 class="product-name"><%= product.productName %></h2>
+                <p class="product-description"><%= product.productDescription %></p>
+                <p class="product-price">$<%= product.productPrice %></p>
+                <form action="/admin/deleteproduct/<%= product._id %>" method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+            <a class="spbutton" href="/admin/editproduct/<%= product._id %>">Edit</a>
+        </div>
+    <% }) %>
+
+</body>
+</html>

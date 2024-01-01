@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/showproduct.css">
+</head>
+<body>
+    <div class="mainContainer">
+    <% data.forEach(eachdata => { %>
+    <div class="product-card">
+        <div class="product-details">
+            <h2 class="product-name"><%=  eachdata.username %></h2>
+            <p class="product-description"><%= eachdata.email %></p>
+            <p class="product-price">$<%= eachdata.usertype %></p>
+            <form action="/admin/deletedata/<%= eachdata._id %>" method="post">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+    <%})%>
+    </div>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="/css/home.css">
   <title>Stylish Homepage</title>
 </head>
 <body>
@@ -14,33 +14,29 @@
         <ul>
           <li><a href="#">Home</a></li>
           <li><a href="#">About</a></li>
-          <li><a href="#">Services</a></li>
+          <li><a href="#">update profile</a></li>
           <li><a href="/logout" class="cta-button">logout</a></li>
         </ul>
       </nav>
     </header>
-    <section class="hero-section">
-      <h2>Welcome to Our Awesome Website</h2>
-      <p>Discover the latest trends and innovations in web design.</p>
-      <a href="#" class="cta-button">Get Started</a>
-    </section>
-    <section class="features-section">
-      <div class="feature">
-        <img src="../assets/imgs/mountain.jpg" alt="Feature 1">
-        <h3>Product</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    <div class="mainContainer">
+
+    <% products.forEach((product)=>{%>
+      <div class="product-card">
+      <div class="product-image">
+          <img src="<%= product.productImage %>" alt="<%= product.productName %>">
+          <div class="overlay"></div>
       </div>
-      <div class="feature">
-        <img src="../assets/imgs/mountain.jpg" alt="Feature 2">
-        <h3></h3>
-        <p>Curabitur auctor elit ac diam ullamcorper, non dapibus massa semper.</p>
+      <div class="product-details">
+          <h2 class="product-name"><%= product.productName %></h2>
+          <p class="product-description"><%= product.productDescription %></p>
+          <p class="product-price">$<%= product.productPrice %></p>
+          <button  class="product-favorite">add to favuoite</button>
       </div>
-      <div class="feature">
-        <img src="../assets/imgs/mountain.jpg" alt="Feature 3">
-        <h3>Feature 3</h3>
-        <p>Praesent bibendum odio in augue tincidunt, vel vulputate dolor fringilla.</p>
-      </div>
-    </section>
+  </div>
+<%})%>
+</div>
+
     <footer>
       <p>&copy; 2023 Awesome Website. All rights reserved.</p>
     </footer>
