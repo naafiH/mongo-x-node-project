@@ -3,15 +3,16 @@ const userData = require("../models/userSchema");
 let loginerrr = "";
 let signuperr = "";
 const bcrypt = require("bcryptjs");
-const product =require("../models/productschema")
+const product = require("../models/productschema");
+const userUpdate = require("../models/userupdate");
 
 const object = {
   homePage: async (req, res) => {
     if (req.session.secure) {
-      const products = await product.find()
-      res.render("user/home",{products});
+      const products = await product.find();
+      res.render("user/home", { products });
     } else {
-      res.redirect("signup");
+      res.redirect("/signup");
     }
   },
   signUpPage: (req, res) => {
@@ -52,8 +53,9 @@ const object = {
           hashPassword,
         };
         console.log(user);
-        req.session.secure = password;
+        req.session.secure = user.hashPassword;
         await userData.insertMany([user]);
+        console.log(user.hashPassword);
         res.redirect("/");
         // }
       }
@@ -62,29 +64,31 @@ const object = {
   postLogin: async (req, res) => {
     const { email, password } = req.body;
     const userExist = await userData.findOne({
-      email: email
+      email: email,
     });
 
-    
     // // console.log(isPassTrue);
     // // console.log(userExist.hashPassword);
     // console.log(password);
     // console.log(userExist._id);
     // console.log(userExist, "esshgdh");
-    if (userExist ) {
-      const isPassTrue = await bcrypt.compare(password,userExist.hashPassword) 
-      if(isPassTrue){
-
-        req.session.secure = userExist._id;
+    if (userExist) {
+      const isPassTrue = await bcrypt.compare(password, userExist.hashPassword);
+      if (isPassTrue) {
         if (userExist.usertype === "admin") {
+          req.session.key = userExist._id;
           console.log(userExist.usertype);
           req.session.isadmin = true;
           res.redirect("admin/adminpage");
         } else {
-          req.session.isadmin = false;
+          req.session.secure = userExist._id;
           console.log("login complete");
           res.redirect("/");
         }
+      } else {
+        loginerrr = "you dont have an account please signup";
+
+        res.redirect("/login");
       }
     } else {
       loginerrr = "you dont have an account please signup";
@@ -94,7 +98,7 @@ const object = {
   },
   logoutGet: (req, res) => {
     req.session.destroy((destroy) => {
-      const userExist =  userData.findOne()
+      const userExist = userData.findOne();
       if (destroy) {
         console.log("there is an error in destroing");
       } else {
@@ -103,15 +107,74 @@ const object = {
       }
     });
   },
-  // showProduct:async(req,res)=>{
-  //   try{
-  //     const products = await product.find()
-  //     console.log(products);
-  //     res.render("user/home",{products})
-  //   }catch{
-      
-  //   }
-  // }
+  viewprofile: async (req, res) => {
+    try {
+      if (req.session.secure) {
+        const data = await userData.findOne({ _id: req.session.secure }); // Retrieve all products from the database
+        const userfindresult = await userData.aggregate([
+          { $match: { _id: data._id } },
+          {
+            $lookup: {
+              from: "userupadates",
+              localField: "_id",
+              foreignField: "userId",  // Adjust this field based on your data structure
+              as: "userProfile",
+            },
+          },
+        ]);
+        console.log(data);
+        console.log(userfindresult);
+        res.render("user/viewprofile", { data, userfindresult });
+      } else {
+        res.redirect("/");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    }
+  },
+  updateProfile: async (req, res) => {
+    if (req.session.secure) {
+      //here we are finding and fatching data using session .this for getting the userId form the database
+      const data = await userData.findOne({ _id: req.session.secure });
+      //Here the data is take from another collection using $looku. profile is the another collection
+      //from where take data and data will store in userprofile(always check the spelling)
+      const userfindresult = await userData.aggregate([
+        { $match: { _id: data._id } },
+        {
+          $lookup: {
+            from: "userupadates",
+            localField: "_id",
+            foreignField: "userId",  // Adjust this field based on your data structure
+            as: "userProfile",
+          },
+        },
+      ]);
+      console.log(userfindresult);
+      res.render("user/updateprofile", { data, userfindresult });
+    } else {
+      res.redirect("/");
+    }
+  },
+  postUpdateprofile: async (req, res) => {
+      const data = await userData.findOne({ _id: req.session.secure });
+      const userId = data._id;
+      const { username, email, dateofbirth, gender, phone } = req.body;
+
+
+      await data.updateOne(
+        { _id: req.session.secure },
+        { $set: { username, email } }
+      );
+
+      await userUpdate.updateOne(
+        { userId },
+        { $set: { userId, dateofbirth, gender, phone } },
+        { upsert: true }
+      );
+      res.redirect("/user/viewprofile");
+      console.log("heyy");
+  },
 };
 
 module.exports = object;

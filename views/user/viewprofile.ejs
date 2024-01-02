@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/CSS/profile.css">
+</head>
+<body>
+    <div class="container">
+        <h2>User Profile</h2>
+        <div class="profile-details">
+            <p><strong>Username:</strong> <%= data.username %></p>
+            <p><strong>Email:</strong> <%= data.email %></p>
+            <% if (userfindresult.length > 0 && userfindresult[0].userProfile.length > 0) { %> <%
+                userfindresult[0].userProfile.forEach(profileDetail => { %>
+                <p>DOB: <%= profileDetail.dateofbirth %></p>
+                <p>gender: <%= profileDetail.gender %></p>
+                <p>phone: <%= profileDetail.phone %></p>
+                <% }); %> <% } else { %>
+                <p>No profile details found.</p>
+                <% } %>
+            <a href="/user/updateprofile">Edit Profile</a>
+        </div>
+    </div>
+</body>
+</html>

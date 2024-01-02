@@ -21,7 +21,8 @@
         <label for="productPrice">Price:</label>
         <input type="number" id="productPrice" name="productPrice" value="<%= product.productPrice %>" required>
 
-        <!-- Add other fields as needed -->
+        <label for="productImage">Image:</label>
+        <input type="file" id="productImage" name="productImage" accept="image/*">
 
         <button type="submit">Update Product</button>
     </form>

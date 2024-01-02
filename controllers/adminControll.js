@@ -3,21 +3,39 @@ const userData = require("../models/userSchema");
 
 const adminObject = {
   adminPage: (req, res) => {
-    res.render("admin/adminpage");
+    if(req.session.key){
+        res.render("admin/adminpage");
+    }else{
+      res.redirect("/"); // Redirect to the login or home page after logout
+    }
+  
   },
   addProduct: (req, res) => {
-    res.render("admin/addproduct");
+    if(req.session.key){
+        res.render("admin/addproduct");
+    }else{
+        res.redirect("/"); // Redirect to the login or home page after logout
+    }
   },
   showProduct: (req, res) => {
-    res.render("admin/showproduct");
+      if(req.session.key){
+          res.render("admin/showproduct");
+      }else{
+      res.redirect("/"); // Redirect to the login or home page after logout
+      }
   },
   showUser: async (req, res) => {
-    try {
-      const data = await userData.find({}); // Retrieve all products from the database
-      res.render("admin/showusers", { data });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal Server Error");
+    if(req.session.key){
+
+        try {
+            const data = await userData.find({}); // Retrieve all products from the database
+            res.render("admin/showusers", { data });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Internal Server Error");
+        }
+    }else{
+        res.redirect("/"); // Redirect to the login or home page after logout
     }
   },
   postAddProduct: async (req, res) => {
@@ -83,13 +101,15 @@ const adminObject = {
     try {
       const productId = req.params.productId;
       const { productName, productDescription, productPrice } = req.body;
-
+      const productImage = req.file
+      ? `/uploads/${req.file.filename}`
+      : "/uploads/defaultimage.jpg";
       // Update the product in the database
       await product.findByIdAndUpdate(productId, {
         productName,
         productDescription,
         productPrice,
-        // Update other fields as needed
+        productImage
       });
 
       res.redirect("/admin/showproduct");
